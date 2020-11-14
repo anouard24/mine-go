@@ -28,6 +28,10 @@ const (
 	marked  state = 7
 )
 
+type point struct {
+	x, y int64
+}
+
 type box struct {
 	val    value
 	status state
@@ -39,6 +43,10 @@ func (b *box) isMine() bool {
 
 func (b *box) isWall() bool {
 	return b.val == wall
+}
+
+func (b *box) isHidden() bool {
+	return b.status == hidden
 }
 
 func (b *box) show() string {
@@ -114,12 +122,17 @@ func (f *field) addWalls() {
 	}
 }
 
+func (f *field) randomPoint() point {
+	x := (time.Now().UnixNano() % int64(f.rows-2)) + 1
+	y := (time.Now().UnixNano() % int64(f.cols-2)) + 1
+	return point{x, y}
+}
+
 func (f *field) initMines(num int) {
 	for i := 0; i < num; {
-		x := (time.Now().UnixNano() % int64(f.rows-2)) + 1
-		y := (time.Now().UnixNano() % int64(f.cols-2)) + 1
-		if !f.boxes[x][y].isMine() {
-			f.boxes[x][y].val = mine
+		p := f.randomPoint()
+		if !f.boxes[p.x][p.y].isMine() {
+			f.boxes[p.x][p.y].val = mine
 			i++
 		}
 	}
