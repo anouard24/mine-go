@@ -4,8 +4,8 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
+	"time"
 )
 
 // values from 0 to 8 indicate how much
@@ -116,8 +116,8 @@ func (f *field) addWalls() {
 
 func (f *field) initMines(num int) {
 	for i := 0; i < num; {
-		x := rand.Intn(f.rows-2) + 2
-		y := rand.Intn(f.cols-2) + 2
+		x := (time.Now().UnixNano() % int64(f.rows-2)) + 1
+		y := (time.Now().UnixNano() % int64(f.cols-2)) + 1
 		if !f.boxes[x][y].isMine() {
 			f.boxes[x][y].val = mine
 			i++
@@ -126,8 +126,9 @@ func (f *field) initMines(num int) {
 }
 
 func main() {
-	f := newField(3, 3)
+	f := newField(4, 4)
 	f.make()
 	f.addWalls()
+	f.initMines(2)
 	f.print()
 }
