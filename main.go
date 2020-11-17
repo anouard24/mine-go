@@ -138,10 +138,29 @@ func (f *field) initMines(num int) {
 	}
 }
 
+func (f *field) calculateAdjacentsMines() {
+	for i := 1; i < f.rows-1; i++ {
+		for j := 1; j < f.cols-1; j++ {
+			if !f.boxes[i][j].isMine() {
+				var val value = 0
+				for k := i - 1; k <= i+1; k++ {
+					for l := j - 1; l <= j+1; l++ {
+						if f.boxes[k][l].isMine() {
+							val++
+						}
+					}
+				}
+				f.boxes[i][j].val = val
+			}
+		}
+	}
+}
+
 func main() {
 	f := newField(4, 4)
 	f.make()
+	f.initMines(4)
+	f.calculateAdjacentsMines()
 	f.addWalls()
-	f.initMines(2)
 	f.print()
 }
