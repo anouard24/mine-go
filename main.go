@@ -84,6 +84,7 @@ type field struct {
 
 func newField(rows, cols int) *field {
 	f := new(field) // new pointer of type field
+	f.numCovered = rows * cols
 	// add 2 rows for top and bottom walls
 	f.rows = rows + 2
 	// add 2 cols for right and left walls
@@ -186,6 +187,10 @@ func (f *field) uncoverBox(p point) bool {
 	return true
 }
 
+func (f *field) gameEnds() bool {
+	return f.numMines == f.numCovered
+}
+
 func main() {
 	f := newField(4, 4)
 	f.make()
@@ -193,13 +198,14 @@ func main() {
 	f.calculateAdjacentsMines()
 	f.addWalls()
 	var p point
-	for {
+	for !f.gameEnds() {
 		f.print()
 		fmt.Println("enter i and j: ")
 		fmt.Scanf("%d%d", &p.x, &p.y)
 		if !f.uncoverBox(p) {
-			fmt.Println("Game over!")
-			break
+			fmt.Println("😢 Ops! Game Over...")
+			return
 		}
 	}
+	fmt.Println("😀 Great! You Win!")
 }
