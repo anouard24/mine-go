@@ -78,6 +78,8 @@ func (b *box) str() string {
 type field struct {
 	rows, cols int
 	boxes      [][]*box
+	numMines   int
+	numCovered int
 }
 
 func newField(rows, cols int) *field {
@@ -129,6 +131,7 @@ func (f *field) randomPoint() point {
 }
 
 func (f *field) initMines(num int) {
+	f.numMines = num
 	for i := 0; i < num; {
 		p := f.randomPoint()
 		if !f.boxes[p.x][p.y].isMine() {
@@ -168,6 +171,7 @@ func (f *field) uncoverBox(p point) bool {
 		return false
 	}
 	curBox.status = open
+	f.numCovered--
 	if curBox.val == clear {
 		// no mine surround this box
 		for i := p.x - 1; i <= p.x+1; i++ {
