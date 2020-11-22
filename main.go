@@ -156,11 +156,46 @@ func (f *field) calculateAdjacentsMines() {
 	}
 }
 
+// return false if uncover a mine
+func (f *field) uncoverBox(p point) bool {
+	curBox := f.boxes[p.x][p.y]
+	if curBox.isWall() || !curBox.isHidden() {
+		// "We can't uncover the box in position (%v, %v)", p.x, p.y
+		return true
+	}
+	if curBox.isMine() {
+		// "Ops! You uncovred a mine!"
+		return false
+	}
+	curBox.status = open
+	if curBox.val == clear {
+		// no mine surround this box
+		for i := p.x - 1; i <= p.x+1; i++ {
+			for j := p.y - 1; j <= p.y+1; j++ {
+				ijBox := f.boxes[i][j]
+				if ijBox.isHidden() {
+					f.uncoverBox(point{i, j})
+				}
+			}
+		}
+	}
+	return true
+}
+
 func main() {
 	f := newField(4, 4)
 	f.make()
 	f.initMines(4)
 	f.calculateAdjacentsMines()
 	f.addWalls()
-	f.print()
+	var p point
+	for {
+		f.print()
+		fmt.Println("enter i and j: ")
+		fmt.Scanf("%d%d", &p.x, &p.y)
+		if !f.uncoverBox(p) {
+			fmt.Println("Game over!")
+			break
+		}
+	}
 }
