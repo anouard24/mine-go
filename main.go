@@ -111,6 +111,16 @@ func (f *field) print() {
 	}
 }
 
+// print all boxes (for debug or in the end of a game)
+func (f *field) printAll() {
+	for i := range f.boxes {
+		for _, b := range f.boxes[i] {
+			fmt.Printf("%2s ", b.show())
+		}
+		fmt.Printf("\n")
+	}
+}
+
 func (f *field) addWalls() {
 	// use the same wall box pointer
 	// because wall boxes don't change state
@@ -191,21 +201,36 @@ func (f *field) gameEnds() bool {
 	return f.numMines == f.numCovered
 }
 
+func scanInput(nameVar string, min, max int) int {
+	val := min - 1
+	for val < min || val > max {
+		fmt.Printf("Enter number of %s  [%d-%d]: ", nameVar, min, max)
+		fmt.Scanf("%d", &val)
+	}
+	return val
+}
+
 func main() {
-	f := newField(4, 4)
+	rows := scanInput("rows", 4, 15)
+	cols := scanInput("cols", 5, 20)
+	// number of mines between 10% and 50% of total boxes
+	mines := scanInput("mines", rows*cols/10, rows*cols/2)
+	f := newField(rows, cols)
 	f.make()
-	f.initMines(4)
+	f.initMines(mines)
 	f.calculateAdjacentsMines()
 	f.addWalls()
 	var p point
 	for !f.gameEnds() {
 		f.print()
-		fmt.Println("enter i and j: ")
+		fmt.Print("enter i and j: ")
 		fmt.Scanf("%d%d", &p.x, &p.y)
 		if !f.uncoverBox(p) {
-			fmt.Println("😢 Ops! Game Over...")
+			f.printAll()
+			fmt.Println("💥 Ops! Game Over...")
 			return
 		}
 	}
-	fmt.Println("😀 Great! You Win!")
+	f.printAll()
+	fmt.Println("🤓 Great! You Win!")
 }
