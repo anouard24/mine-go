@@ -49,6 +49,10 @@ func (b *box) isHidden() bool {
 	return b.status == hidden
 }
 
+func (b *box) isOpen() bool {
+	return b.status == open
+}
+
 func (b *box) show() string {
 	switch b.val {
 	case wall:
@@ -201,6 +205,19 @@ func (f *field) gameEnds() bool {
 	return f.numMines == f.numCovered
 }
 
+func (f *field) getBox(p point) *box {
+	return f.boxes[p.x][p.y]
+}
+
+func (f *field) markMine(p point) bool {
+	curBox := f.getBox(p)
+	if curBox.isWall() || curBox.isOpen() {
+		return false
+	}
+	curBox.status = marked
+	return true
+}
+
 func scanInput(nameVar string, min, max int) int {
 	val := min - 1
 	for val < min || val > max {
@@ -221,14 +238,21 @@ func main() {
 	f.calculateAdjacentsMines()
 	f.addWalls()
 	var p point
+	var cmd int
 	for !f.gameEnds() {
 		f.print()
 		fmt.Print("enter i and j: ")
 		fmt.Scanf("%d%d", &p.x, &p.y)
-		if !f.uncoverBox(p) {
-			f.printAll()
-			fmt.Println("💥 Ops! Game Over...")
-			return
+		fmt.Printf("enter 0 to uncover, 1 to mark: ")
+		fmt.Scanf("%d", &cmd)
+		if cmd == 1 {
+			f.markMine(p)
+		} else {
+			if !f.uncoverBox(p) {
+				f.printAll()
+				fmt.Println("💥 Ops! Game Over...")
+				return
+			}
 		}
 	}
 	f.printAll()
