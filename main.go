@@ -250,11 +250,11 @@ func main() {
 		} else {
 			if !f.uncoverBox(p) {
 				f.printAll()
-				fmt.Println("💥 Ops! Game Over...")
+				fmt.Println("-_- Ops! Game Over...")
 				return
 			}
 		}
 	}
 	f.printAll()
-	fmt.Println("🤓 Great! You Win!")
+	fmt.Println(":-) Great! You Win!")
 }
