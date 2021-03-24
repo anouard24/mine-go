@@ -222,10 +222,23 @@ func (f *field) markMine(p point) bool {
 func scanInput(nameVar string, min, max int) int {
 	val := min - 1
 	for val < min || val > max {
-		fmt.Printf("Enter number of %s  [%d-%d]: ", nameVar, min, max)
-		fmt.Scanf("%d", &val)
+		for {
+			fmt.Printf("Enter number of %s  [%d-%d]: ", nameVar, min, max)
+			if _, err := fmt.Scanf("%d\n", &val); err == nil {
+				break
+			}
+		}
 	}
 	return val
+}
+
+func input(printStr, format string, a ...interface{}) {
+	for {
+		fmt.Print(printStr)
+		if _, err := fmt.Scanf(format, a...); err == nil {
+			break
+		}
+	}
 }
 
 func main() {
@@ -243,10 +256,9 @@ func main() {
 	var cmd int
 	for !f.gameEnds() {
 		f.print()
-		fmt.Print("enter i and j: ")
-		fmt.Scanf("%d%d", &p.x, &p.y)
-		fmt.Printf("enter 0 to uncover, 1 to mark: ")
-		fmt.Scanf("%d", &cmd)
+		input("Enter x and y: ", "%d %d\n", &p.x, &p.y)
+		input("Enter 0 to uncover, 1 to mark: ", "%d\n", &cmd)
+
 		if cmd == 1 {
 			f.markMine(p)
 		} else {
