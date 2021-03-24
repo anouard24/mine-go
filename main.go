@@ -129,14 +129,14 @@ func (f *field) printAll() {
 func (f *field) addWalls() {
 	// use the same wall box pointer
 	// because wall boxes don't change state
-	wallbox := &box{wall, open}
+	wallBox := &box{wall, open}
 	for i := 0; i < f.rows; i++ {
-		f.boxes[i][0] = wallbox
-		f.boxes[i][f.cols-1] = wallbox
+		f.boxes[i][0] = wallBox
+		f.boxes[i][f.cols-1] = wallBox
 	}
 	for j := 0; j < f.cols; j++ {
-		f.boxes[0][j] = wallbox
-		f.boxes[f.rows-1][j] = wallbox
+		f.boxes[0][j] = wallBox
+		f.boxes[f.rows-1][j] = wallBox
 	}
 }
 
@@ -157,7 +157,7 @@ func (f *field) initMines(num int) {
 	}
 }
 
-func (f *field) calculateAdjacentsMines() {
+func (f *field) calculateAdjacentMines() {
 	for i := 1; i < f.rows-1; i++ {
 		for j := 1; j < f.cols-1; j++ {
 			if !f.boxes[i][j].isMine() {
@@ -183,7 +183,7 @@ func (f *field) uncoverBox(p point) bool {
 		return true
 	}
 	if curBox.isMine() {
-		// "Ops! You uncovred a mine!"
+		// "Ops! You uncovered a mine!"
 		return false
 	}
 	curBox.status = open
@@ -192,10 +192,7 @@ func (f *field) uncoverBox(p point) bool {
 		// no mine surround this box
 		for i := p.x - 1; i <= p.x+1; i++ {
 			for j := p.y - 1; j <= p.y+1; j++ {
-				ijBox := f.boxes[i][j]
-				if ijBox.isHidden() {
-					f.uncoverBox(point{i, j})
-				}
+				f.uncoverBox(point{i, j})
 			}
 		}
 	}
@@ -250,7 +247,7 @@ func main() {
 	f := newField(rows, cols)
 	f.make()
 	f.initMines(mines)
-	f.calculateAdjacentsMines()
+	f.calculateAdjacentMines()
 	f.addWalls()
 	var p point
 	var cmd int
