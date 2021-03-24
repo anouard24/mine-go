@@ -50,6 +50,10 @@ func (b *box) isHidden() bool {
 	return b.status == hidden
 }
 
+func (b *box) isMarked() bool {
+	return b.status == marked
+}
+
 func (b *box) isOpen() bool {
 	return b.status == open
 }
@@ -199,6 +203,21 @@ func (f *field) uncoverBox(p point) bool {
 	return true
 }
 
+func (f *field) uncoverAdjacentBoxes(p point) bool {
+	for i := p.x - 1; i <= p.x+1; i++ {
+		for j := p.y - 1; j <= p.y+1; j++ {
+			curPoint := point{i, j}
+			if p != curPoint {
+				if !f.uncoverBox(curPoint) {
+					// We uncover a mine: game over
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
 func (f *field) gameEnds() bool {
 	return f.numMines == f.numCovered
 }
@@ -207,12 +226,24 @@ func (f *field) getBox(p point) *box {
 	return f.boxes[p.x][p.y]
 }
 
-func (f *field) markMine(p point) bool {
+func (f *field) toggleMarkMine(p point) bool {
 	curBox := f.getBox(p)
 	if curBox.isWall() || curBox.isOpen() {
 		return false
 	}
-	curBox.status = marked
+	if curBox.isHidden() {
+		curBox.status = marked
+	}
+	curBox.status = hidden
+	return true
+}
+
+func (f *field) suspectMine(p point) bool {
+	curBox := f.getBox(p)
+	if curBox.isWall() || curBox.isOpen() {
+		return false
+	}
+	curBox.status = suspect
 	return true
 }
 
@@ -238,6 +269,26 @@ func input(printStr, format string, a ...interface{}) {
 	}
 }
 
+func (f *field) runAction(p point, cmd int) bool {
+	switch cmd {
+	case 0:
+		if !f.uncoverBox(p) {
+			f.printAll()
+			fmt.Println("💥 Ops! Game Over...")
+			return false
+		}
+	case 1:
+		return f.toggleMarkMine(p)
+	case 2:
+		return f.suspectMine(p)
+	case 3:
+		return f.uncoverAdjacentBoxes(p)
+	default:
+
+	}
+	return true
+}
+
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	rows := scanInput("rows", 4, 15)
@@ -254,16 +305,18 @@ func main() {
 	for !f.gameEnds() {
 		f.print()
 		input("Enter x and y: ", "%d %d\n", &p.x, &p.y)
-		input("Enter 0 to uncover, 1 to mark: ", "%d\n", &cmd)
+		input(
+			`Enter action number:
+	0 to uncover
+	1 to mark
+	2 to suspect
+	3 to uncover all adjacent boxes
 
-		if cmd == 1 {
-			f.markMine(p)
-		} else {
-			if !f.uncoverBox(p) {
-				f.printAll()
-				fmt.Println("💥 Ops! Game Over...")
-				return
-			}
+>> `,
+			"%d\n", &cmd)
+		if !f.runAction(p, cmd) {
+			// end game
+			return
 		}
 	}
 	f.printAll()
