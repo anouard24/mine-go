@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 )
@@ -140,8 +141,8 @@ func (f *field) addWalls() {
 }
 
 func (f *field) randomPoint() point {
-	x := (time.Now().UnixNano() % int64(f.rows-2)) + 1
-	y := (time.Now().UnixNano() % int64(f.cols-2)) + 1
+	x := int64(rand.Intn(f.rows-2) + 1)
+	y := int64(rand.Intn(f.rows-2) + 1)
 	return point{x, y}
 }
 
@@ -228,6 +229,7 @@ func scanInput(nameVar string, min, max int) int {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	rows := scanInput("rows", 4, 15)
 	cols := scanInput("cols", 5, 20)
 	// number of mines between 10% and 50% of total boxes
