@@ -233,8 +233,9 @@ func (f *field) toggleMarkMine(p point) bool {
 	}
 	if curBox.isHidden() {
 		curBox.status = marked
+	} else {
+		curBox.status = hidden
 	}
-	curBox.status = hidden
 	return true
 }
 
@@ -272,11 +273,7 @@ func input(printStr, format string, a ...interface{}) {
 func (f *field) runAction(p point, cmd int) bool {
 	switch cmd {
 	case 0:
-		if !f.uncoverBox(p) {
-			f.printAll()
-			fmt.Println("💥 Ops! Game Over...")
-			return false
-		}
+		return f.uncoverBox(p)
 	case 1:
 		return f.toggleMarkMine(p)
 	case 2:
@@ -315,7 +312,9 @@ func main() {
 >> `,
 			"%d\n", &cmd)
 		if !f.runAction(p, cmd) {
-			// end game
+			// lose game
+			f.printAll()
+			fmt.Println("💥 Ops! Game Over...")
 			return
 		}
 	}
