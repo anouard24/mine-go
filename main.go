@@ -146,7 +146,7 @@ func (f *field) addWalls() {
 
 func (f *field) randomPoint() point {
 	x := int64(rand.Intn(f.rows-2) + 1)
-	y := int64(rand.Intn(f.rows-2) + 1)
+	y := int64(rand.Intn(f.cols-2) + 1)
 	return point{x, y}
 }
 
