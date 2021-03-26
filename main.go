@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"strconv"
 	"time"
@@ -89,6 +90,7 @@ type field struct {
 	boxes      [][]*box
 	numMines   int
 	numCovered int
+	hints      int
 }
 
 func newField(rows, cols int) *field {
@@ -159,6 +161,13 @@ func (f *field) initMines(num int) {
 			i++
 		}
 	}
+	f.hints = calculateHints(f.numCovered, f.numMines)
+}
+
+func calculateHints(numBoxes, numMines int) int {
+	percentageMines := float64(numMines) / float64(numBoxes)
+	percentageHints := 0.0092 * math.Exp(7.8*percentageMines)
+	return int(math.Round(float64(numBoxes) * percentageHints))
 }
 
 func (f *field) calculateAdjacentMines() {
@@ -179,6 +188,11 @@ func (f *field) calculateAdjacentMines() {
 	}
 }
 
+func (f *field) useHint(p point) {
+	f.hints--
+	f.uncoverBox(p)
+}
+
 // return false if uncover a mine
 func (f *field) uncoverBox(p point) bool {
 	curBox := f.boxes[p.x][p.y]
@@ -186,12 +200,12 @@ func (f *field) uncoverBox(p point) bool {
 		// "We can't uncover the box in position (%v, %v)", p.x, p.y
 		return true
 	}
+	curBox.status = open
+	f.numCovered--
 	if curBox.isMine() {
 		// "Ops! You uncovered a mine!"
 		return false
 	}
-	curBox.status = open
-	f.numCovered--
 	if curBox.val == clear {
 		// no mine surround this box
 		for i := p.x - 1; i <= p.x+1; i++ {
@@ -280,6 +294,9 @@ func (f *field) runAction(p point, cmd int) bool {
 		return f.suspectMine(p)
 	case 3:
 		return f.uncoverAdjacentBoxes(p)
+	case 4:
+		f.useHint(p)
+		return true
 	default:
 
 	}
@@ -301,6 +318,7 @@ func main() {
 	var cmd int
 	for !f.gameEnds() {
 		f.print()
+		fmt.Printf("You have %d hints left\n", f.hints)
 		input("Enter x and y: ", "%d %d\n", &p.x, &p.y)
 		input(
 			`Enter action number:
@@ -308,7 +326,7 @@ func main() {
 	1 to mark
 	2 to suspect
 	3 to uncover all adjacent boxes
-
+	4 to use hint (safe uncover)
 >> `,
 			"%d\n", &cmd)
 		if !f.runAction(p, cmd) {
