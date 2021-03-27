@@ -86,11 +86,12 @@ func (b *box) str() string {
 }
 
 type field struct {
-	rows, cols int
-	boxes      [][]*box
-	numMines   int
-	numCovered int
-	hints      int
+	rows, cols     int
+	boxes          [][]*box
+	numMines       int
+	numCovered     int
+	hints          int
+	remainingMines int
 }
 
 func newField(rows, cols int) *field {
@@ -154,6 +155,7 @@ func (f *field) randomPoint() point {
 
 func (f *field) initMines(num int) {
 	f.numMines = num
+	f.remainingMines = num
 	for i := 0; i < num; {
 		p := f.randomPoint()
 		if !f.getBox(p).isMine() {
@@ -193,6 +195,7 @@ func (f *field) useHint(p point) {
 	if !f.uncoverBox(p) {
 		// the hint uncover a mine!
 		f.numCovered++
+		f.remainingMines--
 	}
 }
 
@@ -251,8 +254,18 @@ func (f *field) toggleMarkMineWith(p point, status state) bool {
 		return true
 	}
 	if curBox.isHidden() {
-		curBox.status = status
+		if status != marked || f.remainingMines > 0 {
+			// change status if it's suspect
+			// or if it is marked and remaining mines > 0
+			curBox.status = status
+			if status == marked {
+				f.remainingMines--
+			}
+		}
 	} else {
+		if curBox.isMarked() {
+			f.remainingMines++
+		}
 		curBox.status = hidden
 	}
 	return true
@@ -314,7 +327,8 @@ func main() {
 	var cmd int
 	for !f.gameEnds() {
 		f.print()
-		fmt.Printf("You have %d hints left\n", f.hints)
+		fmt.Printf("You have %d 🔮 hints left\n", f.hints)
+		fmt.Printf("You have %d \U0001F9E8 mines left\n", f.remainingMines)
 		input("Enter x and y: ", "%d %d\n", &p.x, &p.y)
 		input(
 			`Enter action number:
