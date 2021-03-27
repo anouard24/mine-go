@@ -31,7 +31,7 @@ const (
 )
 
 type point struct {
-	x, y int64
+	x, y int
 }
 
 type box struct {
@@ -148,8 +148,8 @@ func (f *field) addWalls() {
 }
 
 func (f *field) randomPoint() point {
-	x := int64(rand.Intn(f.rows-2) + 1)
-	y := int64(rand.Intn(f.cols-2) + 1)
+	x := rand.Intn(f.rows-2) + 1
+	y := rand.Intn(f.cols-2) + 1
 	return point{x, y}
 }
 
@@ -271,9 +271,18 @@ func (f *field) toggleMarkMineWith(p point, status state) bool {
 	return true
 }
 
+func inRange(val int, min, max int) bool {
+	return val >= min && val <= max
+}
+
+func (f *field) validPoint(p point) bool {
+	return inRange(p.x, 1, f.rows-2) &&
+		inRange(p.y, 1, f.cols-2)
+}
+
 func scanInput(nameVar string, min, max int) int {
 	val := min - 1
-	for val < min || val > max {
+	for !inRange(val, min, max) {
 		for {
 			fmt.Printf("Enter number of %s  [%d-%d]: ", nameVar, min, max)
 			if _, err := fmt.Scanf("%d\n", &val); err == nil {
@@ -294,6 +303,9 @@ func input(printStr, format string, a ...interface{}) {
 }
 
 func (f *field) runAction(p point, cmd int) bool {
+	if !f.validPoint(p) {
+		return true
+	}
 	switch cmd {
 	case 0:
 		return f.uncoverBox(p)
