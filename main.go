@@ -243,7 +243,7 @@ func (f *field) getBox(p point) *box {
 func (f *field) toggleMarkMine(p point) bool {
 	curBox := f.getBox(p)
 	if curBox.isWall() || curBox.isOpen() {
-		return false
+		return true
 	}
 	if curBox.isHidden() {
 		curBox.status = marked
@@ -256,7 +256,7 @@ func (f *field) toggleMarkMine(p point) bool {
 func (f *field) suspectMine(p point) bool {
 	curBox := f.getBox(p)
 	if curBox.isWall() || curBox.isOpen() {
-		return false
+		return true
 	}
 	curBox.status = suspect
 	return true
