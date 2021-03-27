@@ -190,7 +190,10 @@ func (f *field) calculateAdjacentMines() {
 
 func (f *field) useHint(p point) {
 	f.hints--
-	f.uncoverBox(p)
+	if !f.uncoverBox(p) {
+		// the hint uncover a mine!
+		f.numCovered++
+	}
 }
 
 // return false if uncover a mine
@@ -233,7 +236,9 @@ func (f *field) uncoverAdjacentBoxes(p point) bool {
 }
 
 func (f *field) gameEnds() bool {
-	return f.numMines == f.numCovered
+	// if we use a hint that uncover
+	// a mine safely then:
+	return f.numMines >= f.numCovered
 }
 
 func (f *field) getBox(p point) *box {
