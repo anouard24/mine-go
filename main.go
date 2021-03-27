@@ -156,8 +156,8 @@ func (f *field) initMines(num int) {
 	f.numMines = num
 	for i := 0; i < num; {
 		p := f.randomPoint()
-		if !f.boxes[p.x][p.y].isMine() {
-			f.boxes[p.x][p.y].val = mine
+		if !f.getBox(p).isMine() {
+			f.getBox(p).val = mine
 			i++
 		}
 	}
@@ -195,7 +195,7 @@ func (f *field) useHint(p point) {
 
 // return false if uncover a mine
 func (f *field) uncoverBox(p point) bool {
-	curBox := f.boxes[p.x][p.y]
+	curBox := f.getBox(p)
 	if curBox.isWall() || !curBox.isHidden() {
 		// "We can't uncover the box in position (%v, %v)", p.x, p.y
 		return true
@@ -240,25 +240,16 @@ func (f *field) getBox(p point) *box {
 	return f.boxes[p.x][p.y]
 }
 
-func (f *field) toggleMarkMine(p point) bool {
+func (f *field) toggleMarkMineWith(p point, status state) bool {
 	curBox := f.getBox(p)
 	if curBox.isWall() || curBox.isOpen() {
 		return true
 	}
 	if curBox.isHidden() {
-		curBox.status = marked
+		curBox.status = status
 	} else {
 		curBox.status = hidden
 	}
-	return true
-}
-
-func (f *field) suspectMine(p point) bool {
-	curBox := f.getBox(p)
-	if curBox.isWall() || curBox.isOpen() {
-		return true
-	}
-	curBox.status = suspect
 	return true
 }
 
@@ -289,9 +280,9 @@ func (f *field) runAction(p point, cmd int) bool {
 	case 0:
 		return f.uncoverBox(p)
 	case 1:
-		return f.toggleMarkMine(p)
+		return f.toggleMarkMineWith(p, marked)
 	case 2:
-		return f.suspectMine(p)
+		return f.toggleMarkMineWith(p, suspect)
 	case 3:
 		return f.uncoverAdjacentBoxes(p)
 	case 4:
