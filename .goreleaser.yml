@@ -1,0 +1,25 @@
+project_name: "mine-go"
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: "./main.go"
+    binary: "mine-go"
+    goos: ["linux", "darwin", "windows"]
+    goarch: ["386", "amd64"]
+
+changelog:
+  sort: "asc"
+  filters:
+    exclude: ["^docs:", "^test:", "Merge pull request", "Merge branch"]
+
+archives:
+  - format_overrides:
+      - goos: "windows"
+        format: "zip"
+
+nfpms:
+  - formats: ["deb", "rpm"]
+    dependencies: ["git"]
