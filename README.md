@@ -2,7 +2,7 @@
 
 💣 A simple Minesweeper game written in Go
 
-<a href="https://asciinema.org/a/410362"><img src="https://asciinema.org/a/410362.png" width="600"/></a>
+<img src="https://repository-images.githubusercontent.com/312908083/a4cf8900-a7d1-11eb-9f8b-ac7c105adfc8" alt="Mine Go! GIF" width="720"/>
 
 ## Install
 
