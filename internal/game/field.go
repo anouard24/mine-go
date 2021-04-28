@@ -1,6 +1,6 @@
 // Copyright 2020 Anouar Fadili.
 
-package main
+package game
 
 import (
 	"fmt"
@@ -327,7 +327,7 @@ func (f *field) runAction(p point, cmd int) bool {
 	return true
 }
 
-func main() {
+func Start() {
 	rand.Seed(time.Now().UnixNano())
 	rows := scanInput("rows", 4, 15)
 	cols := scanInput("cols", 5, 20)

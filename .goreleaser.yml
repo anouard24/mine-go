@@ -5,7 +5,7 @@ before:
     - go mod tidy
 
 builds:
-  - main: "./main.go"
+  - main: "./cmd/mine-go/main.go"
     binary: "mine-go"
     goos: ["linux", "darwin", "windows"]
     goarch: ["386", "amd64"]
