@@ -342,8 +342,8 @@ func main() {
 	var cmd int
 	for !f.gameEnds() {
 		f.print()
-		fmt.Printf("You have %d 🔮 hints left\n", f.hints)
-		fmt.Printf("You have %d \U0001F9E8 mines left\n", f.remainingMines)
+		fmt.Printf("You have %d hints left\n", f.hints)
+		fmt.Printf("You have %d mines left\n", f.remainingMines)
 		input("Enter x and y: ", "%d %d\n", &p.x, &p.y)
 		input(
 			`Enter action number:
@@ -357,10 +357,10 @@ func main() {
 		if !f.runAction(p, cmd) {
 			// lose game
 			f.printAll()
-			fmt.Println("💥 Ops! Game Over...")
+			fmt.Println("Ops! Game Over...")
 			return
 		}
 	}
 	f.printAll()
-	fmt.Println("🤓 Great! You Win!")
+	fmt.Println("Great! You Win!")
 }
