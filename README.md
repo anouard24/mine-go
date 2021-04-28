@@ -2,6 +2,8 @@
 
 💣 A simple Minesweeper game written in Go
 
+<a href="https://asciinema.org/a/410362"><img src="https://asciinema.org/a/410362.png" width="600"/></a>
+
 ## Install
 
 ### Linux, MacOS, and Windows
