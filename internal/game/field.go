@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/anouard24/mine-go/internal/ui"
 )
 
 // values from 0 to 8 indicate how much
@@ -62,24 +64,24 @@ func (b *box) isOpen() bool {
 func (b *box) show() string {
 	switch b.val {
 	case wall:
-		return "+"
+		return ui.HiddenStyle.Render("+")
 	case mine:
-		return "@"
+		return ui.BoxStyles[9].Render("@")
 	case clear:
-		return " "
+		return ui.BoxStyles[0].Render("0")
 	default:
-		return strconv.Itoa(int(b.val))
+		return ui.BoxStyles[int(b.val)].Render(strconv.Itoa(int(b.val)))
 	}
 }
 
 func (b *box) str() string {
 	switch b.status {
 	case marked:
-		return "X"
+		return ui.MarkStyle.Render("F")
 	case suspect:
-		return "S"
+		return ui.SuspectStyle.Render("?")
 	case hidden:
-		return "."
+		return ui.HiddenStyle.Render(".")
 	default:
 		return b.show()
 	}
@@ -117,7 +119,7 @@ func (f *field) make() {
 func (f *field) print() {
 	for i := range f.boxes {
 		for _, b := range f.boxes[i] {
-			fmt.Printf("%2s ", b.str())
+			fmt.Printf("%s", b.str())
 		}
 		fmt.Printf("\n")
 	}
@@ -127,7 +129,7 @@ func (f *field) print() {
 func (f *field) printAll() {
 	for i := range f.boxes {
 		for _, b := range f.boxes[i] {
-			fmt.Printf("%2s ", b.show())
+			fmt.Printf("%s", b.show())
 		}
 		fmt.Printf("\n")
 	}
@@ -329,6 +331,7 @@ func (f *field) runAction(p point, cmd int) bool {
 
 func Start() {
 	rand.Seed(time.Now().UnixNano())
+	ui.InitBoxStyles()
 	rows := scanInput("rows", 4, 15)
 	cols := scanInput("cols", 5, 20)
 	// number of mines between 10% and 50% of total boxes
