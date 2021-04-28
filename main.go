@@ -191,6 +191,9 @@ func (f *field) calculateAdjacentMines() {
 }
 
 func (f *field) useHint(p point) {
+	curBox := f.getBox(p)
+	// force open box ( like if it is marked)
+	curBox.status = open
 	f.hints--
 	if !f.uncoverBox(p) {
 		// the hint uncover a mine!
